@@ -1,11 +1,5 @@
-const { Sequelize, DataTypes } = require('sequelize');
-
-const sequelize = new Sequelize('database', 'username', 'password', {
-  host: 'localhost',
-  dialect: 'sqlite',
-  storage: './db/database.sqlite',
-  database: './db/database.sqlite',
-});
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db/dbConnect');
 
 const Music = sequelize.define(
   'Music',

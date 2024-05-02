@@ -13,13 +13,6 @@ const specs = swaggerJsdoc(options);
 const Music = require('./model/Music.js');
 
 
-(async () => {
-  //const music1 = await Music.create({ cover: "harry_styles-watermelon_sugar.jpg", sound: "Harry_Styles-Watermelon_Sugar.mp3", title: "Harry Styles - Watermelon Sugar", category: "pop"});
-
-  //console.log(await Music.findAll());
-})();
-
-
 /*-----FUNCTION----*/
 function myCors(req, res, nxt) {
   res.header('Access-Control-Allow-Origin', '*');
@@ -37,7 +30,8 @@ function myCors(req, res, nxt) {
   const sequelize = new Sequelize('database', 'username', 'password', {
     host: 'localhost',
     dialect: 'sqlite',
-    storage: './db/database.sqlite'
+    storage: './db/database.sqlite',
+    database: './db/database.sqlite',
   });
   
   try {
@@ -46,6 +40,16 @@ function myCors(req, res, nxt) {
   } catch (error) {
     console.error('Unable to connect to the database:', error);
   }
+})();
+(async () => {
+  await Music.sync({ force: true }).then(() => {
+    console.log('Models synchronized successfully.');
+  }).catch(e => {
+    console.log(e);
+  });
+  const music1 = await Music.create({ cover: "harry_styles-watermelon_sugar.jpg", sound: "Harry_Styles-Watermelon_Sugar.mp3", title: "Harry Styles - Watermelon Sugar", category: "pop"});
+  const music2 = await Music.create({ cover: "THOMAS_styles-watermelon_sugar.jpg", sound: "Harry_Styles-Watermelon_Sugar.mp3", title: "Harry Styles - Watermelon Sugar", category: "pop"});
+  //console.log(await Music.findAll());
 })();
 
 /*-----CODE----*/

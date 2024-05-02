@@ -1,7 +1,10 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize({
+
+const sequelize = new Sequelize('database', 'username', 'password', {
+  host: 'localhost',
   dialect: 'sqlite',
-  storage: '../db/database.sqlite'
+  storage: './db/database.sqlite',
+  database: './db/database.sqlite',
 });
 
 const Music = sequelize.define(
@@ -29,14 +32,14 @@ const Music = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     }
+  },
+  {
+    tableName: 'musics',
   }
 );
 
 (async () => {
-  await sequelize.sync({ force: true });
-  // Code here
-})();
-// `sequelize.define` also returns the model
-console.log(Music === sequelize.models.Music); // true
-module.exports = Music;
 
+
+})();
+module.exports = Music;

@@ -1,6 +1,5 @@
 /*-----IMPORT----*/
 const express = require('express');
-const { Sequelize } = require('sequelize');
 const app = express();
 const port = 3000
 const version = "v1"

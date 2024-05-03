@@ -1,5 +1,6 @@
 const Music = require("../model/Music");
 const fs = require('fs');
+const path = require('path');
 
 const controllerMusic = {
     find: async (req,res) => {
@@ -102,16 +103,18 @@ const controllerMusic = {
         res.status(200).json({result: music});
     },
 
-    downloadCover: (req,res)=>{
+    downloadCover: (req, res) => {
         const fileName = req.params.fileName;
         const directory = req.params.directory;
-        if(directory != "cover" && directory != "sound"){
-            return res.status(400).json({error: "Directory not exist ! It's cover or sound"});
+        if (directory !== "cover" && directory !== "sound") {
+            return res.status(400).json({ error: "Directory not exist ! It's cover or sound" });
         }
-        if(fs.existsSync(`./uploads/${directory}/${fileName}`)){
-            return res.download(`./uploads/${directory}/${fileName}`);
+        const filePath = path.resolve(`./uploads/${directory}/${fileName}`);
+        if (fs.existsSync(filePath)) {
+            // Envoyer le fichier au client sans le télécharger
+            return res.sendFile(filePath);
         } else {
-            return res.status(404).json({error: "File not found"});
+            return res.status(404).json({ error: "File not found" });
         }
     }
 };

@@ -24,6 +24,11 @@
             }
         ],
         "components": {
+            "securitySchemes": {
+                "bearerAuth": "authorization",
+                "type": "http",
+                "scheme": "bearer"
+            },
             "schemas": {
                 "music": {
                     "type": "object",
@@ -202,6 +207,9 @@
                     "tags": [
                         "music"
                     ],
+                    "security": {
+                        "bearerAuth": ["authorization"]
+                    },
                     "parameters": [
                         {
                             "in": "path",
@@ -251,6 +259,9 @@
                     "tags": [
                         "music"
                     ],
+                    "security": {
+                        "bearerAuth": ["authorization"]
+                    },
                     "parameters": [
                         {
                             "in": "path",

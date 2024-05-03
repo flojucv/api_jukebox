@@ -1,6 +1,7 @@
 const Music = require("../model/Music");
 const fs = require('fs');
 const path = require('path');
+const sequelize = require('../db/dbConnect');
 
 const controllerMusic = {
     find: async (req,res) => {
@@ -19,7 +20,8 @@ const controllerMusic = {
     },
 
     create: async (req,res)=> {
-        if(!req.files.cover || !req.files.sound || !req.body.title || !req.body.category) {
+        console.log(req.files)
+        if(req.files.cover.length == 0 || req.files.sound.length == 0 || !req.body.title || !req.body.category) {
             return res.status(400).json({error: `One or more param are not found (${(!req.files.cover) ? 'cover,' : ''} ${(!req.body.sound) ? 'sound,' : ''} ${(!req.body.title) ? 'title,' : ''} ${(!req.body.category) ? 'category' : ''})`})
         }
         const nextAutoIncrementValue = await sequelize.query("SELECT seq FROM sqlite_sequence WHERE name='musics'", { raw: true });
@@ -77,8 +79,8 @@ const controllerMusic = {
             return res.status(404).json({error: "Music not found"});
         }
 
-        fs.unlinkSync(`./uploads/cover/${music.id}-${music.cover}`);
-        fs.unlinkSync(`./uploads/musics/${music.id}-${music.sound}`);
+        fs.unlinkSync(`./uploads/cover/${music.cover}`);
+        fs.unlinkSync(`./uploads/sound/${music.sound}`);
         await Music.destroy({ where: { id } });
         const data = await Music.findAll();
         return res.status(200).json({message: `${id} have been deleted`, result: data})

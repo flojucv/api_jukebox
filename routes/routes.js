@@ -10,7 +10,7 @@ const sequelize = require('../db/dbConnect');
 const createStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (file.fieldname == "sound")
-            cb(null, './uploads/musics');
+            cb(null, './uploads/sound');
         else if (file.fieldname == 'cover')
             cb(null, './uploads/cover');
 
@@ -41,7 +41,7 @@ const createStorage = multer.diskStorage({
 const updateStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         if(file.fieldname == "sound")
-            cb(null, './uploads/musics');
+            cb(null, './uploads/sound');
         else if(file.fieldname == "cover")
             cb(null, './uploads/cover');
     },
@@ -66,8 +66,8 @@ const updateStorage = multer.diskStorage({
         const id = req.params.id;
         const music = await Music.findByPk(id);
         if(music) {
-            if (fs.existsSync(`./uploads/${(file.fieldname == 'sound') ? 'musics' : 'cover'}/${id}-${(file.fieldname) == 'sound' ? music.sound : music.cover}`))
-                fs.unlinkSync(`./uploads/${(file.fieldname == 'sound') ? 'musics' : 'cover'}/${id}-${(file.fieldname) == 'sound' ? music.sound : music.cover}`);
+            if (fs.existsSync(`./uploads/${(file.fieldname == 'sound') ? 'sound' : 'cover'}/${id}-${(file.fieldname) == 'sound' ? music.sound : music.cover}`))
+                fs.unlinkSync(`./uploads/${(file.fieldname == 'sound') ? 'sound' : 'cover'}/${id}-${(file.fieldname) == 'sound' ? music.sound : music.cover}`);
             return cb(null, `${id}-${file.originalname}`);
         } else {
             const error = new Error('Music not found');
@@ -76,6 +76,22 @@ const updateStorage = multer.diskStorage({
         }
     }
 })
+
+const auth = (req, res, next) => {
+    const bearerHeaders = req.headers['authorization'];
+    if(typeof bearerHeaders !== 'undefined') {
+        const bearer = bearerHeaders.split(' ');
+        const bearerToken = bearer[1];
+        
+        if(bearerToken == process.env.TOKEN) {
+            next();
+        } else {
+            return res.status(403).json({error: 'Token invalid'});
+        }
+    } else {
+        return res.status(403).json({error: 'Token missing'});
+    }
+}
 
 const create = multer({ storage: createStorage });
 const update = multer({ storage: updateStorage });
@@ -90,12 +106,12 @@ router.post('/', (req, res) => {
 
 
 router.get('/music', controllerMusic.find);
-router.post('/music', create.fields([{ name: "sound" }, { name: "cover" }]), controllerMusic.create);
+router.post('/music', auth, create.fields([{ name: "sound" }, { name: "cover" }]), controllerMusic.create);
 router.get('/music/random', random);
 router.get('/music/:id', controllerMusic.findById);
-router.delete('/music/:id', controllerMusic.delete);
+router.delete('/music/:id', auth,  controllerMusic.delete);
 const updateFiles = update.fields([{name: 'sound'},{name: 'cover'}]);
-router.put('/music/:id', function(req,res){
+router.put('/music/:id', auth, function(req,res){
     updateFiles(req,res,function(err){
         if (err) {
             return res.status(err.code).send({ error: err.message })
